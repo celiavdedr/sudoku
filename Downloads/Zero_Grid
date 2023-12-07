@@ -1,0 +1,16 @@
+def MakeSudoku():
+    Grid = [[0 for x in range(9)] for y in range(9)]
+    
+#Liste externe (for y in range(9)) - cette liste va tourner 9 fois, en creant chaque fois une nouvelle liste interne (= 9 rangées)
+#Liste interne ([0 for x in range(9)]) - cette liste va determiner le contenu des liste et combien d'elements apparaissent (= 0 apparrait 9 fois pour chaque liste)
+    
+    for i in range(9):
+        for j in range(9):
+            Grid[i][j] = 0
+    return Grid
+
+# Loop externe (for i in range(9)): viens iterer sur les rangées
+# Loop interne (for j in range(9)): viens iterer sur les elements de chaque rangée
+# Assignation Grid[i][j] = 0 : fonctionne comme des des coordonnés [x][y] et y assigne 0
+    
+MakeSudoku()
