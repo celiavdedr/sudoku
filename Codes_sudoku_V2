@@ -1,0 +1,97 @@
+import random
+
+def is_valid_move(board, row, col, num):
+    # Vérifie si un nombre ne se trouve pas déjà dans la même ligne ou colonne
+    if num in board[row] or num in [board[i][col] for i in range(9)]:
+        return False
+
+    # 2 - Vérifie si un nombre ne se trouve pas déjà dans le même carré de 3x3
+    subgrid_row, subgrid_col = 3 * (row // 3), 3 * (col // 3)
+    for i in range(3):
+        for j in range(3):
+            if board[subgrid_row + i][subgrid_col + j] == num:
+                return False
+
+    return True
+
+def solve_sudoku(board):
+    empty = find_empty_location(board)
+    if not empty:
+        return True
+    
+    row, col = empty
+    for num in range(1, 10):
+        if is_valid_move(board, row, col, num):
+            board[row][col] = num
+            if solve_sudoku(board):
+                return True
+            board[row][col] = 0
+
+    return False
+
+def find_empty_location(board):
+    for i in range(9):
+        for j in range(9):
+            if board[i][j] == 0:
+                return (i, j)
+    return None
+
+def generate_sudoku():
+    sudoku_grid = [[0 for _ in range(9)] for _ in range(9)]
+    solve_sudoku(sudoku_grid)
+    return sudoku_grid
+
+def remove_cells(board, difficulty_level):
+    puzzle = [row[:] for row in board]
+    cells_to_remove = {'easy': 49, 'medium': 51, 'hard': 58}.get(difficulty_level, 49)
+
+    for _ in range(cells_to_remove):
+        while True:
+            row = random.randint(0, 8)
+            col = random.randint(0, 8)
+            if puzzle[row][col] != 0:
+                puzzle[row][col] = 0
+                break
+
+    return puzzle
+
+def print_sudoku(board):
+    col_labels = 'ABCDEFGHI'
+    print('   ' + ' '.join(col_labels))
+    for i, row in enumerate(board):
+        print(f"{i+1}  {' '.join(str(num) if num != 0 else '.' for num in row)}")
+
+def play_sudoku(difficulty):
+    board = generate_sudoku()
+    board = remove_cells(board, difficulty)  
+    print_sudoku(board)
+
+    while find_empty_location(board):
+        try:
+            user_input = input("Entrez votre prochain mouvement (format : 'ColonneLigne Nombre' ou 'exit' pour mettre fin à la partie): ")
+            if user_input.lower() == 'exit':
+                print("Partie terminée par l'utilisateur.")
+                return
+
+            col, row, num = user_input[0].upper(), int(user_input[1])-1, int(user_input[3])
+            if col < 'A' or col > 'I' or row < 0 or row > 8 or num < 1 or num > 9:
+                print("Entrée invalide. Essayez le format 'ColonneLigne Nombre'.")
+                continue
+
+            col_index = ord(col) - ord('A')
+            if board[row][col_index] != 0:
+                print("La case est déjà pleine. Choisissez une case vide.")
+                continue
+
+            if is_valid_move(board, row, col_index, num):
+                board[row][col_index] = num
+                print_sudoku(board)
+            else:
+                print("Entrée invalide. Rententez votre chance.")
+
+        except (ValueError, IndexError):
+            print("Entrée invalide. Essayez le format 'ColonneLigne Nombre'.")
+
+    print("Félicitation ! Vous avez terminé le Sudoku.") 
+
+play_sudoku('easy') 
